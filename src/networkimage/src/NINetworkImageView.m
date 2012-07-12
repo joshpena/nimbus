@@ -270,7 +270,7 @@
   [self setPathToNetworkImage: pathToNetworkImage
                forDisplaySize: CGSizeZero
                   contentMode: self.contentMode
-                     cropRect: CGRectZero];
+                     cropRect: CGRectZero authorizationToken:nil];
 }
 
 
@@ -279,7 +279,7 @@
   [self setPathToNetworkImage: pathToNetworkImage
                forDisplaySize: displaySize
                   contentMode: self.contentMode
-                     cropRect: CGRectZero];
+                     cropRect: CGRectZero authorizationToken:nil];
 }
 
 
@@ -288,7 +288,7 @@
   [self setPathToNetworkImage: pathToNetworkImage
                forDisplaySize: displaySize
                   contentMode: contentMode
-                     cropRect: CGRectZero];
+                     cropRect: CGRectZero authorizationToken:nil];
 }
 
 
@@ -297,7 +297,7 @@
   [self setPathToNetworkImage: pathToNetworkImage
                forDisplaySize: CGSizeZero
                   contentMode: self.contentMode
-                     cropRect: cropRect];
+                     cropRect: cropRect authorizationToken:nil];
 }
 
 
@@ -306,12 +306,21 @@
   [self setPathToNetworkImage: pathToNetworkImage
                forDisplaySize: CGSizeZero
                   contentMode: contentMode
-                     cropRect: CGRectZero];
+                     cropRect: CGRectZero authorizationToken:nil];
+}
+
+- (void)setPathToNetworkImage:(NSString *)pathToNetworkImage withAuthorization:(NSString *)token
+{
+    [self setPathToNetworkImage: pathToNetworkImage
+                 forDisplaySize: CGSizeZero
+                    contentMode: self.contentMode
+                       cropRect: CGRectZero authorizationToken:token];
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)setPathToNetworkImage:(NSString *)pathToNetworkImage forDisplaySize:(CGSize)displaySize contentMode:(UIViewContentMode)contentMode cropRect:(CGRect)cropRect {
+- (void)setPathToNetworkImage:(NSString *)pathToNetworkImage forDisplaySize:(CGSize)displaySize contentMode:(UIViewContentMode)contentMode cropRect:(CGRect)cropRect authorizationToken:(NSString *)token 
+{
   [self cancelOperation];
 
   if (NIIsStringWithAnyText(pathToNetworkImage)) {
@@ -370,7 +379,10 @@
         contentMode = UIViewContentModeScaleToFill;
       }
 
-      NSURLRequest *request = [NSURLRequest requestWithURL:url];
+      NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        if (token) {
+            [request addValue:token forHTTPHeaderField:@"Authorization"];
+        }
       AFImageRequestOperation *operation =
       [AFImageRequestOperation imageRequestOperationWithRequest:request imageProcessingBlock:
        ^UIImage *(UIImage *downloadedImage) {
